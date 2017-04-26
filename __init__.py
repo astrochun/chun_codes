@@ -606,3 +606,54 @@ def rem_dup(values):
   return np.array(output)
 
 #enddef
+
+def gauss2d((x, y), amplitude, xo, yo, sigma_x, sigma_y, theta, offset):
+    '''
+    2-D Gaussian for opt.curve_fit()
+
+    Parameters
+    ----------
+    (x,y) : numpy.ndarray
+      x,y grid from numpy.meshgrid()
+
+    amplitude : float
+      Peak of Gaussian
+
+    xo : float
+      Gaussian center value along x
+
+    yo : float
+      Gaussian center value along y
+
+    sigma_x : float
+      Gaussian sigma along x
+
+    sigma_y : float
+      Gaussian sigma along y
+
+    theta : float
+      Orientation along major axis of Gaussian. Positive is clock-wise.
+
+    offset : float
+      Level of continuum
+
+    Returns
+    -------
+    g.ravel() : numpy.ndarray
+      Contiguous flattened array
+
+    Notes
+    -----
+    Created by Chun Ly, 26 April 2017
+     - Copied from MMTtools.mmtcam for more general use
+    '''
+
+    xo = float(xo)
+    yo = float(yo)
+    a = (np.cos(theta)**2)/(2*sigma_x**2) + (np.sin(theta)**2)/(2*sigma_y**2)
+    b = -(np.sin(2*theta))/(4*sigma_x**2) + (np.sin(2*theta))/(4*sigma_y**2)
+    c = (np.sin(theta)**2)/(2*sigma_x**2) + (np.cos(theta)**2)/(2*sigma_y**2)
+    g = offset + amplitude*np.exp( - (a*((x-xo)**2) + 2*b*(x-xo)*(y-yo)
+                            + c*((y-yo)**2)))
+    return g.ravel()
+#enddef
