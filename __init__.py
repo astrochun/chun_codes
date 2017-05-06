@@ -646,7 +646,10 @@ def gauss2d((x, y), amplitude, xo, yo, sigma_x, sigma_y, theta, offset):
     -----
     Created by Chun Ly, 26 April 2017
      - Copied from MMTtools.mmtcam for more general use
+    Modified by Chun Ly, 6 May 2017
+     - Fix bug. Need to import numpy
     '''
+    import numpy as np
 
     xo = float(xo)
     yo = float(yo)
