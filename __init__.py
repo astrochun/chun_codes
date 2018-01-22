@@ -660,3 +660,65 @@ def gauss2d((x, y), amplitude, xo, yo, sigma_x, sigma_y, theta, offset):
                             + c*((y-yo)**2)))
     return g.ravel()
 #enddef
+
+def exec_pdfmerge(files, pages, outfile, merge=False, silent=False, verbose=True):
+    '''
+    Executes pdfmerge command to grab necessary pages and merge them if desired
+
+    Require installing pdfmerge:
+    https://pypi.python.org/pypi/pdfmerge/0.0.7
+      > pip install pdfmerge
+
+    Parameters
+    ----------
+    files : list
+      List of files (must include full path)
+
+    pages : list
+      List of strings indicating pages to extract.
+      E.g.: ['4,6,15,20','3,8,44,50']
+
+    outfile : list or str
+      Either List of files to write or a single file if merge == True
+
+    silent : boolean
+      Turns off stdout messages. Default: False
+
+    verbose : boolean
+      Turns on additional stdout messages. Default: True
+
+    Returns
+    -------
+
+    Notes
+    -----
+    Created by Chun Ly, 22 January 2018
+    '''
+
+    import pdfmerge
+
+    if not merge:
+      if len(outfile) != len(files):
+        log.warn('### outfile input not complete. Missing files!')
+
+    if silent == False: log.info('### Begin exec_pdfmerge : '+systime())
+
+    n_files = len(files)
+
+    writer0 = None
+
+    for nn in range(n_files):
+      writer0 = pdfmerge.add(files[nn], rules=pages[nn], writer=writer0)
+
+      if merge == False:
+        with open(outfile[nn], 'wb') as stream:
+          writer0.write(stream)
+        writer0 = None
+    #endfor
+
+    if merge == True:
+      with open(outfile, 'wb') as stream:
+        writer0.write(stream)
+
+    if silent == False: log.info('### End exec_pdfmerge : '+systime())
+#enddef
