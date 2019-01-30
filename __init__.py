@@ -696,8 +696,9 @@ def exec_pdfmerge(files, pages, outfile, merge=False, silent=False, verbose=True
     '''
 
     import pdfmerge
+    from astropy import log
 
-    if not merge:
+    if merge == False:
       if len(outfile) != len(files):
         log.warn('### outfile input not complete. Missing files!')
 
