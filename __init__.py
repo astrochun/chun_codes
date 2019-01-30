@@ -176,8 +176,8 @@ def random_pdf(x, dx, seed_i=False, n_iter=1000, silent=True):
       np.random.seed(seed0[ii])
       temp = np.random.normal(0.0, 1.0, size=n_iter)
 
-      rand_ans  = x[ii] + dx[ii]*temp
-      x_pdf[ii] = rand_ans
+    rand_ans  = x[ii] + dx[ii]*temp
+    x_pdf[ii] = rand_ans
   #endfor
 
   return x_pdf
