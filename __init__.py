@@ -153,7 +153,7 @@ def ds9_reg(XX, YY, ds9_file, color='green', aper=[2.0], image=False, wcs=False,
   f.close()
 #enddef
 
-def random_pdf(x, dx, seed_i=False, n_iter=1000., silent=True):
+def random_pdf(x, dx, seed_i=False, n_iter=1000, silent=True):
   ## Added on 24/06/2016
   ## Mod on 29/06/2016 to reverse shape
 
