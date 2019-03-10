@@ -143,7 +143,7 @@ def ds9_reg(XX, YY, ds9_file, color='green', aper=[2.0], image=False, wcs=False,
           'highlite=1 edit=1 move=1 delete=1 include=1 fixed=0 source', coord]
 
   #print str0
-  print '### Writing : ', ds9_file
+  print('### Writing : ', ds9_file)
   f = file(ds9_file, 'w')
   for jj in range(len(str0)): f.write(str0[jj]+'\n')
   for ii in range(len(XX)):
