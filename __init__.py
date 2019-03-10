@@ -53,7 +53,7 @@ def chun_crossmatch(x1, y1, x2, y2, dcr, **kwargs):
 
   silent = 0
   if kwargs and kwargs.has_key('silent'): silent = 1
-  if not silent: print '### Begin chun_crossmatch '+systime()
+  if not silent: print('### Begin chun_crossmatch '+systime())
 
   verbose = 0
   if kwargs and kwargs.has_key('verbose'): verbose = 1
@@ -67,7 +67,7 @@ def chun_crossmatch(x1, y1, x2, y2, dcr, **kwargs):
   cnt = long(0)
   for ii in range(len0):
     if verbose and len0 >= 100000:
-      if ii%1000 == 0: print 'ii = '+strn(ii, f='(I)'), systime()
+      if ii%1000 == 0: print('ii = '+strn(ii, f='(I)'), systime())
 
     if sph == 1:
       xdiff = (x1[ii] - x2)*3600.0*np.cos(y1[ii]*np.pi/180.0)
@@ -115,7 +115,7 @@ def chun_crossmatch(x1, y1, x2, y2, dcr, **kwargs):
       ind1 = np.array(zsave)
       ind2 = np.array(save)
 
-  if not silent: print '### End chun_crossmatch '+systime()
+  if not silent: print('### End chun_crossmatch '+systime())
   return ind1, ind2
 #enddef
 
