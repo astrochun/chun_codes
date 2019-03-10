@@ -489,7 +489,7 @@ def plot_compare(x0, y0, out_pdf, labels, extra_label=['',''], idx=None,
      - Minor modification for limit for [in_field]
     '''
     
-    if silent == False: print '### Begin plot_compare | '+systime()
+    if silent == False: print('### Begin plot_compare | '+systime())
     
     from matplotlib import pyplot as plt
     import matplotlib.gridspec as gridspec
@@ -588,10 +588,10 @@ def plot_compare(x0, y0, out_pdf, labels, extra_label=['',''], idx=None,
       fig.clear()
     #endfor
 
-    print '### Writing : ', out_pdf
+    print('### Writing : ', out_pdf)
     pp.close()
 
-    if silent == False: print '### End plot_compare | '+systime()
+    if silent == False: print('### End plot_compare | '+systime())
 #enddef
 
 def rem_dup(values):
