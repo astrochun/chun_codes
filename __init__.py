@@ -160,7 +160,7 @@ def random_pdf(x, dx, seed_i=False, n_iter=1000, silent=True):
   import numpy as np
 
   len0 = len(x)
-  if silent == False: print len0
+  if silent == False: print(len0)
 
   # Mod on 29/06/2016
   x_pdf  = np.zeros((len0, n_iter), dtype=np.float64)
