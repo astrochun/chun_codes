@@ -189,7 +189,7 @@ def compute_onesig_pdf(arr0, x_val, usepeak=False, silent=True, verbose=False):
 
   import numpy as np
 
-  if silent == False: print '### Begin compute_onesig_pdf | '+systime()
+  if silent == False: print('### Begin compute_onesig_pdf | '+systime())
 
   len0 = arr0.shape[0] # arr0.shape[1] # Mod on 29/06/2016
 
@@ -228,7 +228,7 @@ def compute_onesig_pdf(arr0, x_val, usepeak=False, silent=True, verbose=False):
       #  xpeak[ii] = mybins[np.where(htemp == peak)[0]]
     #endif
   #endfor
-  if silent == False: print '### End compute_onesig_pdf | '+systime()
+  if silent == False: print('### End compute_onesig_pdf | '+systime())
   return err, xpeak
 #enddef
 
