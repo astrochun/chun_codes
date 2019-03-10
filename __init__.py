@@ -399,7 +399,7 @@ def plot_data_err_hist(x, dx, xlabel, out_pdf, c0='b', m0='o', a0=0.5, s0=25,
       fig.clear()
     #endfor
 
-    print '### Writing : ', out_pdf
+    print('### Writing : ', out_pdf)
     pp.close()
 #enddef
 
