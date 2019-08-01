@@ -607,14 +607,18 @@ def rem_dup(values):
 
 #enddef
 
-def gauss2d((x, y), amplitude, xo, yo, sigma_x, sigma_y, theta, offset):
+def gauss2d(xy, amplitude, xo, yo, sigma_x, sigma_y, theta, offset):
     '''
     2-D Gaussian for opt.curve_fit()
 
     Parameters
     ----------
-    (x,y) : numpy.ndarray
-      x,y grid from numpy.meshgrid()
+    xy : tuple
+       Tuple of x,y grid from numpy.meshgrid()
+       gx = np.linspace(0,shape0[0]-1,shape0[0])
+       gy = np.linspace(0,shape0[1]-1,shape0[1])
+       gx, gy = numpy.meshgrid(gx, gy)
+       xy = (gx, gy)
 
     amplitude : float
       Peak of Gaussian
@@ -650,6 +654,9 @@ def gauss2d((x, y), amplitude, xo, yo, sigma_x, sigma_y, theta, offset):
      - Fix bug. Need to import numpy
     '''
     import numpy as np
+
+    x = xy[0]
+    y = xy[1]
 
     xo = float(xo)
     yo = float(yo)
