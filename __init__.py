@@ -47,6 +47,33 @@ def intersect(a, b):
   import numpy as np
   return np.array(list(set(a) & set(b)))
 
+def intersect_ndim(a, b, shape0):
+    """
+    Similar to intersect to cross-match multi-dimensional indexing arrays
+    Uses numpy unravel and ravel options
+
+    Parameters
+    ----------
+    a : tuple containing numpy arrays for each dimension.
+        Output of np.where() calls
+
+    b : tuple containing numpy arrays for each dimension.
+        Output of np.where() calls
+
+    shape0 : tuple or list
+        Shape of N-dimensional numpy array. e.g., [array].shape
+
+    Returns
+    -------
+    tuple containing numpy arrays for each dimension
+    """
+
+
+    ravel_a  = np.ravel_multi_index(a, shape0)
+    ravel_b  = np.ravel_multi_index(b, shape0)
+    ab_union = intersect(ravel_a, ravel_b)
+    return np.unravel_index(ab_union, shape0)
+
 def chun_crossmatch(x1, y1, x2, y2, dcr, **kwargs):
   # Mod on 23/04/2016 to fix ind1,ind2 if no return is made
   import numpy as np
