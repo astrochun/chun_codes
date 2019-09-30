@@ -68,6 +68,7 @@ def intersect_ndim(a, b, shape0):
     tuple containing numpy arrays for each dimension
     """
 
+    import numpy as np
 
     ravel_a  = np.ravel_multi_index(a, shape0)
     ravel_b  = np.ravel_multi_index(b, shape0)
