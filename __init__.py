@@ -4,6 +4,42 @@ def systime():
 
 #enddef
 
+
+class TimerClass:
+    """
+    object to start and stop timer to record elapsed time
+
+    Attributes
+    ----------
+    start : datetime object
+            Starting value for timer
+    stop  : datetime object
+            Stopping value for timer
+    delta : datetime object
+            Time difference
+    """
+
+    from datetime import datetime as dt
+
+    def __init__(self):
+        self.start = 0
+        self.stop = 0
+        self.delta = 0
+        self.format = ""
+
+    def _start(self):
+        self.start = self.dt.now()
+
+    def _stop(self):
+        self.stop = self.dt.now()
+        self.delta = self.stop - self.start
+        sec = self.delta.seconds
+        HH = sec // 3600
+        MM = (sec // 60) - (HH * 60)
+        SS = sec - (HH * 3600) - (MM * 60)
+        self.format = "%i hours  %i minutes  %i seconds" % (HH, MM, SS)
+#endclass
+
 def match_nosort(a, b, uniq=False):
     # Modified on 06/04/2016 to include uniq.
     import numpy as np
