@@ -113,7 +113,10 @@ def intersect_ndim(a, b, shape0):
     ravel_a = np.ravel_multi_index(a, shape0)
     ravel_b = np.ravel_multi_index(b, shape0)
     ab_union = intersect(ravel_a, ravel_b)
-    return np.unravel_index(ab_union, shape0)
+    if len(ab_union) != 0:
+        return np.unravel_index(ab_union, shape0)
+    else:
+        return [-1]
 
 
 def chun_crossmatch(x1, y1, x2, y2, dcr, **kwargs):
