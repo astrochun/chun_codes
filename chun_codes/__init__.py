@@ -1,3 +1,6 @@
+__version__ = "0.6.0"
+
+
 def systime():
     import time
     return time.strftime("%d_%b_%Y_%H:%M:%S", time.localtime())
