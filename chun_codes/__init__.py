@@ -2,8 +2,6 @@ def systime():
     import time
     return time.strftime("%d_%b_%Y_%H:%M:%S", time.localtime())
 
-#enddef
-
 
 class TimerClass:
     """
@@ -38,50 +36,47 @@ class TimerClass:
         MM = (sec // 60) - (HH * 60)
         SS = sec - (HH * 3600) - (MM * 60)
         self.format = "%i hours  %i minutes  %i seconds" % (HH, MM, SS)
-#endclass
 
-def match_nosort(a, b, uniq=False):
-    # Modified on 06/04/2016 to include uniq.
+
+def match_nosort(a, b, unique=False):
+    # Modified on 06/04/2016 to include unique.
     import numpy as np
     subb = np.repeat(-1, len(a))
 
     for ii in range(len(a)):
         mark = np.where(b == a[ii])
-        if len(mark[0]) == 1: subb[ii] = mark[0]
+        if len(mark[0]) == 1:
+            subb[ii] = mark[0]
         if len(mark[0]) >= 2:
-            if uniq == True: subb[ii] = mark[0][0]
-    # endfor
+            if unique:
+                subb[ii] = mark[0][0]
 
-    # print subb
     suba = (np.where(subb != -1))[0]
     subb = subb[suba]
 
     return suba, subb
-# enddef
 
-### Not fully tested
+
+# Not fully tested
 def match_nosort_str(a, b):
     import numpy as np
 
-    subb = np.repeat(-1, len(a))
+    sub_b = np.repeat(-1, len(a))
 
-    suba = np.array([i for i, v in enumerate(a) if v in set(b)])
+    # sub_a = np.array([i for i, v in enumerate(a) if v in set(b)])
 
     for ii in range(len(a)):
         mark = [xx for xx in range(len(b)) if a[ii] in b[xx]]
-        if len(mark) == 1: subb[ii] = mark[0]
-    # endfor
-    #
-    # print subb
-    suba = (np.where(subb != -1))[0]
-    subb = subb[suba]
-    #
-    return suba, subb
+        if len(mark) == 1:
+            sub_b[ii] = mark[0]
+
+    sub_a = (np.where(sub_b != -1))[0]
+    sub_b = sub_b[sub_a]
+
+    return sub_a, sub_b
 
 
-# enddef
-
-### + on 04/03/2016
+# + on 04/03/2016
 def intersect(a, b):
     import numpy as np
     return np.array(list(set(a) & set(b)))
@@ -119,29 +114,22 @@ def intersect_ndim(a, b, shape0):
         return [-1]
 
 
-def chun_crossmatch(x1, y1, x2, y2, dcr, **kwargs):
+def chun_crossmatch(x1, y1, x2, y2, dcr, silent=False, verbose=False, sph=False):
     # Mod on 23/04/2016 to fix ind1,ind2 if no return is made
     import numpy as np
 
-    silent = 0
-    if kwargs and kwargs.has_key('silent'): silent = 1
-    if not silent: print('### Begin chun_crossmatch ' + systime())
-
-    verbose = 0
-    if kwargs and kwargs.has_key('verbose'): verbose = 1
-
-    sph = 0
-    if kwargs and kwargs.has_key('sph'): sph = 1
+    if not silent:
+        print('### Begin chun_crossmatch ' + systime())
 
     len0 = len(x1)
-    # print len0
 
-    cnt = long(0)
+    cnt = 0
     for ii in range(len0):
         if verbose and len0 >= 100000:
-            if ii % 1000 == 0: print('ii = ' + strn(ii, f='(I)'), systime())
+            if ii % 1000 == 0:
+                print('ii = %s %s'.format(ii, systime()))
 
-        if sph == 1:
+        if sph:
             xdiff = (x1[ii] - x2) * 3600.0 * np.cos(y1[ii] * np.pi / 180.0)
             ydiff = (y1[ii] - y2) * 3600.0
         else:
@@ -150,50 +138,43 @@ def chun_crossmatch(x1, y1, x2, y2, dcr, **kwargs):
 
         distance = np.sqrt(xdiff ** 2 + ydiff ** 2)
 
-        inreg = (np.where(distance <= dcr))[0]
-        # print ii, inreg
-        # inreg = [xx for xx in range(len(distance)) if (distance[xx] <= dcr)]
+        in_reg = (np.where(distance <= dcr))[0]
 
-        if len(inreg) > 0:
-            min = [xx for xx in range(len(distance)) if
-                   (distance[xx] == np.min(distance[inreg]))]
+        if len(in_reg) > 0:
+            min0 = [xx for xx in range(len(distance)) if
+                    (distance[xx] == np.min(distance[in_reg]))]
             if cnt == 0:
-                save = min
-                zsave = [ii]
-                dx = [xdiff[min]]
-                dy = [ydiff[min]]
+                save = min0
+                z_save = [ii]
+                dx = [xdiff[min0]]
+                dy = [ydiff[min0]]
             else:
-                zsave.append(ii)
+                z_save.append(ii)
 
-                if len(min) == 1:
-                    save.append(min[0])
-                    dx.append(xdiff[min])
-                    dy.append(ydiff[min])
+                if len(min0) == 1:
+                    save.append(min0[0])
+                    dx.append(xdiff[min0])
+                    dy.append(ydiff[min0])
                 else:
-                    for jj in range(len(min)):
-                        save.append(min[jj])
-                        dx.append(xdiff[min[jj]])
-                        dy.append(ydiff[min[jj]])
-                    # endfor
-                # endelse
+                    for jj in range(len(min0)):
+                        save.append(min0[jj])
+                        dx.append(xdiff[min0[jj]])
+                        dy.append(ydiff[min0[jj]])
             cnt = cnt + 1
-        # endif
-    # endfor
 
-    if (cnt == 0):
+    if cnt == 0:
         ind1 = np.array([-1])
         ind2 = np.array([-1])
     else:
-        ind1 = np.array(zsave)
+        ind1 = np.array(z_save)
         ind2 = np.array(save)
 
-    if not silent: print('### End chun_crossmatch ' + systime())
+    if not silent:
+        print('### End chun_crossmatch ' + systime())
     return ind1, ind2
 
 
-# enddef
-
-def ds9_reg(XX, YY, ds9_file, color='green', aper=[2.0], image=False, wcs=False, file0=''):
+def ds9_reg(XX, YY, ds9_file, color='green', aperture=[2.0], image=False, wcs=False, file0=''):
     import numpy as np
 
     if color != 'green':
@@ -201,18 +182,22 @@ def ds9_reg(XX, YY, ds9_file, color='green', aper=[2.0], image=False, wcs=False,
     else:
         color_str = ''
 
-    if image == True:
+    if not image and not wcs:
+        print("Error. Require image or wcs flag")
+        return
+
+    if image:
         coord = 'physical'
-        suff0 = ')' + color_str
+        suffix0 = ')' + color_str
 
-    if wcs == True:
+    if wcs:
         coord = 'fk5'
-        suff0 = '")' + color_str
+        suffix0 = '")' + color_str
 
-    if len(aper) == 1:
-        aper0 = np.repeat(aper[0], len(XX))
+    if len(aperture) == 1:
+        aperture0 = np.repeat(aperture[0], len(XX))
     else:
-        aper0 = aper
+        aperture0 = aperture
 
     str0 = ['# Region file format: DS9 version 4.0', '# Filename: ' + file0,
             ' global color=green font="helvetica 10 normal" select=1 ' +
@@ -220,35 +205,36 @@ def ds9_reg(XX, YY, ds9_file, color='green', aper=[2.0], image=False, wcs=False,
 
     # print str0
     print('### Writing : ', ds9_file)
-    f = file(ds9_file, 'w')
+    f = open(ds9_file, 'w')
     for jj in range(len(str0)): f.write(str0[jj] + '\n')
     for ii in range(len(XX)):
-        txt = 'circle(%f,%f,%f%s\n' % (XX[ii], YY[ii], aper0[ii], suff0)
+        txt = 'circle(%f,%f,%f%s\n' % (XX[ii], YY[ii], aperture0[ii], suffix0)
         f.write(txt)
 
     f.close()
 
 
-# enddef
-
 def random_pdf(x, dx, seed_i=False, n_iter=1000, silent=True):
-    ## Added on 24/06/2016
-    ## Mod on 29/06/2016 to reverse shape
+    """
+    Created on 24/06/2016
+    Modified on 29/06/2016 to reverse shape
+    """
 
     import numpy as np
 
     len0 = len(x)
-    if silent == False: print(len0)
+    if not silent:
+        print(len0)
 
     # Mod on 29/06/2016
     x_pdf = np.zeros((len0, n_iter), dtype=np.float64)
     # x_pdf = np.zeros((n_iter, len0), dtype=np.float64)
 
-    if seed_i != False:
+    if seed_i:
         seed0 = seed_i + np.arange(len0)
 
     for ii in range(len0):
-        if seed_i == False:
+        if not seed_i:
             temp = np.random.normal(0.0, 1.0, size=n_iter)
         else:
             np.random.seed(seed0[ii])
@@ -256,74 +242,49 @@ def random_pdf(x, dx, seed_i=False, n_iter=1000, silent=True):
 
         rand_ans = x[ii] + dx[ii] * temp
         x_pdf[ii] = rand_ans
-    # endfor
 
     return x_pdf
 
 
-# enddef
-
 def compute_onesig_pdf(arr0, x_val, usepeak=False, silent=True, verbose=False):
-    ### + on 28/06/2016
-    ### Mod on 29/06/2016 to handle change in shape
+    """
+    Created on 28/06/2016
+    Modified on 29/06/2016 to handle change in shape
+    """
 
     import numpy as np
 
-    if silent == False: print('### Begin compute_onesig_pdf | ' + systime())
+    if not silent:
+        print('### Begin compute_onesig_pdf | ' + systime())
 
     len0 = arr0.shape[0]  # arr0.shape[1] # Mod on 29/06/2016
 
     err = np.zeros((len0, 2))  # np.zeros((2,len0)) # Mod on 29/06/2016
-    xpeak = np.zeros(len0)
-
-    conf = 0.68269  # 1-sigma
+    x_peak = np.zeros(len0)
 
     for ii in range(len0):
         test = arr0[ii]  # arr0[:,ii] # Mod on 29/06/2016
-        good = np.where(np.isfinite(test) == True)[0]
+        good = np.where(np.isfinite(test))[0]
         if len(good) > 0:
             v_low = np.percentile(test[good], 15.8655)
             v_high = np.percentile(test[good], 84.1345)
 
-            xpeak[ii] = np.percentile(test[good], 50.0)
-            if usepeak == False:
+            x_peak[ii] = np.percentile(test[good], 50.0)
+            if not usepeak:
                 t_ref = x_val[ii]
             else:
-                t_ref = xpeak[ii]
+                t_ref = x_peak[ii]
 
             err[ii, 0] = t_ref - v_low
             err[ii, 1] = v_high - t_ref
-            # err[0,ii] = t_ref - v_low
-            # err[1,ii] = v_high - t_ref
-
-            # sig0 = np.std(test[good])
-            # if sig0 != 0.0:
-            #  datamin = np.min(test[good])
-            #  datamax = np.max(test[good])
-            #  numbins = np.ceil((datamax-datamin)/(sig0/5.0))
-            #  mybins  = np.linspace(datamin, datamax, numbins)
-            #  htemp, jnk = np.histogram(temp[good], mybins)
-            #
-            #  peak      = np.max(htemp)
-            #  xpeak[ii] = mybins[np.where(htemp == peak)[0]]
-        # endif
-    # endfor
-    if silent == False: print('### End compute_onesig_pdf | ' + systime())
-    return err, xpeak
+    if not silent:
+        print('### End compute_onesig_pdf | ' + systime())
+    return err, x_peak
 
 
-# enddef
-
-#  if len(save) N_elements(save) gt N_elements(zsave) then begin
-#     print, '### Error: (x2,y2) may have duplicate position entries. '+systime()
-#     print, '### Exiting!!!'
-#     return
-#  endif
-# enddef
-
-def plot_data_err_hist(x, dx, xlabel, out_pdf, c0='b', m0='o', a0=0.5, s0=25,
+def plot_data_err_hist(x, dx, x_label, out_pdf, c0='b', m0='o', a0=0.5, s0=25,
                        x_bins=50, y_bins=50, xlim=None, ylim=None):
-    '''
+    """
 
     Generate plot of variable and uncertainty on variable. This produces
     a three-panel PDF with histograms on variable at the bottom and
@@ -332,39 +293,43 @@ def plot_data_err_hist(x, dx, xlabel, out_pdf, c0='b', m0='o', a0=0.5, s0=25,
     Parameters
     ----------
     x : array_like
-        An array or arrays of variable (N or N_var x N)
+      An array or arrays of variable (N or N_var x N)
 
     dx : array_like
-        An array or arrays of uncertainty for x (N or N_var x N)
+      An array or arrays of uncertainty for x (N or N_var x N)
+
+    x_label: str
+      Label for x
 
     out_pdf : file path, file object, or file like object
-        File to write to.  If opened, must be opened for append (ab+).
+      File to write to.  If opened, must be opened for append (ab+).
 
     c0 : color or sequence of color, optional, default : 'b'
-        `c` can be a single color format string, or a sequence of color
-        specifications of length `N`, or a sequence of `N` numbers to be
-        mapped to colors using the `cmap` and `norm` specified via kwargs
-        (see below). Note that `c` should not be a single numeric RGB or
-        RGBA sequence because that is indistinguishable from an array of
-        values to be colormapped.  `c` can be a 2-D array in which the
-        rows are RGB or RGBA, however.
+      `c` can be a single color format string, or a sequence of color
+      specifications of length `N`, or a sequence of `N` numbers to be
+      mapped to colors using the `cmap` and `norm` specified via kwargs
+      (see below). Note that `c` should not be a single numeric RGB or
+      RGBA sequence because that is indistinguishable from an array of
+      values to be colormapped.  `c` can be a 2-D array in which the
+      rows are RGB or RGBA, however.
 
     m0 : `~matplotlib.markers.MarkerStyle`, optional, default: 'o'
-        See `~matplotlib.markers` for more information on the different
-        styles of markers scatter supports.
+      See `~matplotlib.markers` for more information on the different
+      styles of markers scatter supports.
 
     a0 : scalar, optional, default: None
-        The alpha blending value, between 0 (transparent) and 1 (opaque)
+      The alpha blending value, between 0 (transparent) and 1 (opaque)
+
+    s0 : int
+      Size of markers
 
     x_bins : integer or array_like for x, optional, default: 50
-        If an integer is given, `bins + 1` bin edges are returned,
-        consistently with :func:`numpy.histogram` for numpy version >=
-        1.3.
+      If an integer is given, `bins + 1` bin edges are returned,
+      consistently with :func:`numpy.histogram` for numpy version >= 1.3.
 
     y_bins : integer or array_like for dx, optional, default: 50
-        If an integer is given, `bins + 1` bin edges are returned,
-        consistently with :func:`numpy.histogram` for numpy version >=
-        1.3.
+      If an integer is given, `bins + 1` bin edges are returned,
+      consistently with :func:`numpy.histogram` for numpy version >= 1.3.
 
     xlim : array_like, optional, default: None
         limits for x
@@ -376,18 +341,17 @@ def plot_data_err_hist(x, dx, xlabel, out_pdf, c0='b', m0='o', a0=0.5, s0=25,
     -----
         Created by Chun Ly on 29 June 2016
         Additional modification to handle multiple variables
-    '''
+    """
 
     from matplotlib import pyplot as plt
     import matplotlib.gridspec as gridspec
-    from pylab import subplots_adjust
     import numpy as np
     from matplotlib.backends.backend_pdf import PdfPages  # + on 29/06/2016
 
     if x.ndim == 1:
         x = x.reshape((1, len(x)))
         dx = dx.reshape((1, len(dx)))
-        xlabel = [xlabel]
+        x_label = [x_label]
         xlim = np.array(xlim)
         xlim = xlim.reshape((1, 2))
         ylim = np.array(ylim)
@@ -416,10 +380,12 @@ def plot_data_err_hist(x, dx, xlabel, out_pdf, c0='b', m0='o', a0=0.5, s0=25,
                     edgecolor='none', label=ax1_label)
         ax1.xaxis.set_ticklabels([])
 
-        if xlim != None: ax1.set_xlim(xlim[ii])
-        if ylim != None: ax1.set_ylim(ylim[ii])
+        if not isinstance(xlim, type(None)):
+            ax1.set_xlim(xlim[ii])
+        if not isinstance(ylim, type(None)):
+            ax1.set_ylim(ylim[ii])
 
-        ylabel = r'$\sigma$(' + xlabel[ii] + ')'
+        ylabel = r'$\sigma$(' + x_label[ii] + ')'
         ax1.set_ylabel(ylabel)
 
         ax1.legend(loc='lower right', fontsize='12', scatterpoints=3,
@@ -438,10 +404,10 @@ def plot_data_err_hist(x, dx, xlabel, out_pdf, c0='b', m0='o', a0=0.5, s0=25,
         ax2.annotate(txt0, (0.97, 0.97), xycoords='axes fraction', ha='right',
                      va='top')
 
-        ax2.set_xlabel(xlabel[ii])
+        ax2.set_xlabel(x_label[ii])
         ax2.set_ylabel('N')
 
-        if xlim != None:
+        if not isinstance(xlim, type(None)):
             ax2.set_xlim(xlim[ii])
         else:
             ax2.set_xlim(ax1.get_xlim())
@@ -461,7 +427,7 @@ def plot_data_err_hist(x, dx, xlabel, out_pdf, c0='b', m0='o', a0=0.5, s0=25,
         ax3.annotate(txt0, (0.94, 0.03), xycoords='axes fraction',
                      ha='right', va='bottom')
 
-        if ylim != None:
+        if not isinstance(ylim, type(None)):
             ax3.set_ylim(ylim[ii])
         else:
             ax3.set_ylim = (ax1.get_ylim())
@@ -471,39 +437,33 @@ def plot_data_err_hist(x, dx, xlabel, out_pdf, c0='b', m0='o', a0=0.5, s0=25,
         ax2.minorticks_on()
         ax3.minorticks_on()
 
-        subplots_adjust(left=0.01, bottom=0.01, top=0.99, right=0.99,
-                        wspace=0.05, hspace=0.05)
+        plt.subplots_adjust(left=0.01, bottom=0.01, top=0.99, right=0.99,
+                            wspace=0.05, hspace=0.05)
 
         fig = plt.gcf()
         fig.set_size_inches(8, 8)
 
         fig.savefig(pp, format='pdf', bbox_inches='tight')
-        # fig.savefig(out_pdf, bbox_inches='tight')
         plt.close()
         fig.clear()
-    # endfor
 
     print('### Writing : ', out_pdf)
     pp.close()
 
 
-# enddef
-
 def quad_low_high_err(err, hi=None):
     import numpy as np
 
-    if hi == None:
+    if not isinstance(hi, type(None)):
         return np.sqrt((err[:, 0] ** 2 + err[:, 1] ** 2) / 2.0)
     else:
         return np.sqrt((err ** 2 + hi ** 2) / 2.0)
 
 
-# enddef
-
 def plot_compare(x0, y0, out_pdf, labels, extra_label=['', ''], idx=None,
                  x0_err=None, y0_err=None, xlim=None, ylim=None, c0='b',
                  m0='o', a0=0.5, s0=25, silent=False, verbose=True):
-    '''
+    """
     Provide explanation for function here.
 
     Parameters
@@ -559,13 +519,13 @@ def plot_compare(x0, y0, out_pdf, labels, extra_label=['', ''], idx=None,
 
     s0 : scalar or array_like, shape (n, ), optional, default: 25
         size in points^2.
- 
+
     silent : boolean
           Turns off stdout messages. Default: False
 
     verbose : boolean
           Turns off additional stdout messages. Default: True
-	  
+
     Returns
     -------
 
@@ -574,29 +534,30 @@ def plot_compare(x0, y0, out_pdf, labels, extra_label=['', ''], idx=None,
     Created by Chun Ly, 15 July 2016
     Modified by Chun Ly, 18 July 2016
      - Minor modification for limit for [in_field]
-    '''
+    """
 
-    if silent == False: print('### Begin plot_compare | ' + systime())
+    if not silent:
+        print('### Begin plot_compare | ' + systime())
 
     from matplotlib import pyplot as plt
     import matplotlib.gridspec as gridspec
-    from pylab import subplots_adjust
     import numpy as np
     from matplotlib.backends.backend_pdf import PdfPages
 
     if x0.ndim == 1:
         x0 = x0.reshape((1, len(x0)))
         y0 = y0.reshape((1, len(y0)))
-        if xlim != None:
+        if not isinstance(xlim, type(None)):
             xlim = np.array(xlim)
             xlim = xlim.reshape((1, 2))
-        if ylim != None:
+        if not isinstance(ylim, type(None)):
             ylim = np.array(ylim)
             ylim = ylim.reshape((1, 2))
 
     n_var = x0.shape[0]
 
-    if idx == None: idx = range(x0.shape[1])
+    if isinstance(idx, type(None)):
+        idx = range(x0.shape[1])
 
     pp = PdfPages(out_pdf)
 
@@ -608,7 +569,7 @@ def plot_compare(x0, y0, out_pdf, labels, extra_label=['', ''], idx=None,
         # Top Panel #
 
         # Get number of sources within region
-        if xlim != None and ylim != None:
+        if not isinstance(xlim, type(None)) and not isinstance(ylim, type(None)):
             # Mod on 18/07/2016. Bug found with y range. ylim -> xlim
             in_field = [(xlim[ii, 0] <= a <= xlim[ii, 1] and
                          xlim[ii, 0] <= b <= xlim[ii, 1]) for a, b in
@@ -623,7 +584,7 @@ def plot_compare(x0, y0, out_pdf, labels, extra_label=['', ''], idx=None,
 
         ax1.xaxis.set_ticklabels([])
 
-        if xlim != None:
+        if not isinstance(xlim, type(None)):
             ax1.set_xlim(xlim[ii])
             ax1.set_ylim(xlim[ii])
 
@@ -652,19 +613,19 @@ def plot_compare(x0, y0, out_pdf, labels, extra_label=['', ''], idx=None,
         ax2.set_xlabel(xlabel)
         ax2.set_ylabel('diff.')
 
-        if xlim != None:
+        if not isinstance(xlim, type(None)):
             ax2.set_xlim(xlim[ii])
         else:
             ax2.set_xlim(ax1.get_xlim())
 
-        if ylim != None:
+        if not isinstance(ylim, type(None)):
             ax2.set_ylim(ylim[ii])
 
         ax1.minorticks_on()
         ax2.minorticks_on()
 
-        subplots_adjust(left=0.01, bottom=0.01, top=0.99, right=0.99,
-                        wspace=0.03, hspace=0.03)
+        plt.subplots_adjust(left=0.01, bottom=0.01, top=0.99, right=0.99,
+                            wspace=0.03, hspace=0.03)
 
         fig = plt.gcf()
         fig.set_size_inches(8, 8)
@@ -672,15 +633,13 @@ def plot_compare(x0, y0, out_pdf, labels, extra_label=['', ''], idx=None,
         fig.savefig(pp, format='pdf', bbox_inches='tight')
         plt.close()
         fig.clear()
-    # endfor
 
     print('### Writing : ', out_pdf)
     pp.close()
 
-    if silent == False: print('### End plot_compare | ' + systime())
+    if not silent:
+        print('### End plot_compare | ' + systime())
 
-
-# enddef
 
 def rem_dup(values):
     # + on 18/08/2016
@@ -747,8 +706,8 @@ def gauss2d(xy, amplitude, xo, yo, sigma_x, sigma_y, theta, offset):
     x = xy[0]
     y = xy[1]
 
-    xo = float(xo)
-    yo = float(yo)
+    xo = np.array(xo)
+    yo = np.array(yo)
     a = (np.cos(theta) ** 2) / (2 * sigma_x ** 2) + (np.sin(theta) ** 2) / (2 * sigma_y ** 2)
     b = -(np.sin(2 * theta)) / (4 * sigma_x ** 2) + (np.sin(2 * theta)) / (4 * sigma_y ** 2)
     c = (np.sin(theta) ** 2) / (2 * sigma_x ** 2) + (np.cos(theta) ** 2) / (2 * sigma_y ** 2)
@@ -757,10 +716,8 @@ def gauss2d(xy, amplitude, xo, yo, sigma_x, sigma_y, theta, offset):
     return g.ravel()
 
 
-# enddef
-
 def exec_pdfmerge(files, pages, outfile, merge=False, silent=False, verbose=True):
-    '''
+    """
     Executes pdfmerge command to grab necessary pages and merge them if desired
 
     Require installing pdfmerge:
@@ -791,16 +748,17 @@ def exec_pdfmerge(files, pages, outfile, merge=False, silent=False, verbose=True
     Notes
     -----
     Created by Chun Ly, 22 January 2018
-    '''
+    """
 
     import pdfmerge
     from astropy import log
 
-    if merge == False:
+    if not merge:
         if len(outfile) != len(files):
             log.warn('### outfile input not complete. Missing files!')
 
-    if silent == False: log.info('### Begin exec_pdfmerge : ' + systime())
+    if not silent:
+        log.info('### Begin exec_pdfmerge : ' + systime())
 
     n_files = len(files)
 
@@ -809,15 +767,14 @@ def exec_pdfmerge(files, pages, outfile, merge=False, silent=False, verbose=True
     for nn in range(n_files):
         writer0 = pdfmerge.add(files[nn], rules=pages[nn], writer=writer0)
 
-        if merge == False:
+        if not merge:
             with open(outfile[nn], 'wb') as stream:
                 writer0.write(stream)
             writer0 = None
-    # endfor
 
-    if merge == True:
+    if merge:
         with open(outfile, 'wb') as stream:
             writer0.write(stream)
 
-    if silent == False: log.info('### End exec_pdfmerge : ' + systime())
-# enddef
+    if not silent:
+        log.info('### End exec_pdfmerge : ' + systime())
