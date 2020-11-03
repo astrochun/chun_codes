@@ -1,14 +1,31 @@
+import sys
+
+import time
+from datetime import datetime as dt
+
+import numpy as np
+
+import matplotlib.pyplot as plt
+from matplotlib import gridspec
+from matplotlib.backends.backend_pdf import PdfPages
+
+from astropy import log
+
+py_vers = sys.version_info.major
+if py_vers == 2:
+    import pdfmerge
+
 __version__ = "0.6.0"
 
 
 def systime():
-    import time
     return time.strftime("%d_%b_%Y_%H:%M:%S", time.localtime())
 
 
 class TimerClass:
     """
-    object to start and stop timer to record elapsed time
+    Purpose:
+      Object that records elapsed time
 
     Attributes
     ----------
@@ -20,8 +37,6 @@ class TimerClass:
             Time difference
     """
 
-    from datetime import datetime as dt
-
     def __init__(self):
         self.start = 0
         self.stop = 0
@@ -29,10 +44,10 @@ class TimerClass:
         self.format = ""
 
     def _start(self):
-        self.start = self.dt.now()
+        self.start = dt.now()
 
     def _stop(self):
-        self.stop = self.dt.now()
+        self.stop = dt.now()
         self.delta = self.stop - self.start
         sec = self.delta.seconds
         HH = sec // 3600
@@ -43,7 +58,7 @@ class TimerClass:
 
 def match_nosort(a, b, unique=False):
     # Modified on 06/04/2016 to include unique.
-    import numpy as np
+
     subb = np.repeat(-1, len(a))
 
     for ii in range(len(a)):
@@ -60,9 +75,8 @@ def match_nosort(a, b, unique=False):
     return suba, subb
 
 
-# Not fully tested
 def match_nosort_str(a, b):
-    import numpy as np
+    # Not fully tested
 
     sub_b = np.repeat(-1, len(a))
 
@@ -79,9 +93,15 @@ def match_nosort_str(a, b):
     return sub_a, sub_b
 
 
-# + on 04/03/2016
 def intersect(a, b):
-    import numpy as np
+    """
+    Purpose:
+      Find the common intersection of two list using set logic
+
+    :param a: first list or numpy array
+    :param b: second list or numpy array
+    :return: numpy array containing intersection of values
+    """
     return np.array(list(set(a) & set(b)))
 
 
@@ -106,8 +126,6 @@ def intersect_ndim(a, b, shape0):
     tuple containing numpy arrays for each dimension
     """
 
-    import numpy as np
-
     ravel_a = np.ravel_multi_index(a, shape0)
     ravel_b = np.ravel_multi_index(b, shape0)
     ab_union = intersect(ravel_a, ravel_b)
@@ -119,7 +137,6 @@ def intersect_ndim(a, b, shape0):
 
 def chun_crossmatch(x1, y1, x2, y2, dcr, silent=False, verbose=False, sph=False):
     # Mod on 23/04/2016 to fix ind1,ind2 if no return is made
-    import numpy as np
 
     if not silent:
         print('### Begin chun_crossmatch ' + systime())
@@ -133,13 +150,13 @@ def chun_crossmatch(x1, y1, x2, y2, dcr, silent=False, verbose=False, sph=False)
                 print('ii = %s %s'.format(ii, systime()))
 
         if sph:
-            xdiff = (x1[ii] - x2) * 3600.0 * np.cos(y1[ii] * np.pi / 180.0)
-            ydiff = (y1[ii] - y2) * 3600.0
+            x_diff = (x1[ii] - x2) * 3600.0 * np.cos(y1[ii] * np.pi / 180.0)
+            y_diff = (y1[ii] - y2) * 3600.0
         else:
-            xdiff = x1[ii] - x2
-            ydiff = y1[ii] - y2
+            x_diff = x1[ii] - x2
+            y_diff = y1[ii] - y2
 
-        distance = np.sqrt(xdiff ** 2 + ydiff ** 2)
+        distance = np.sqrt(x_diff ** 2 + y_diff ** 2)
 
         in_reg = (np.where(distance <= dcr))[0]
 
@@ -149,20 +166,20 @@ def chun_crossmatch(x1, y1, x2, y2, dcr, silent=False, verbose=False, sph=False)
             if cnt == 0:
                 save = min0
                 z_save = [ii]
-                dx = [xdiff[min0]]
-                dy = [ydiff[min0]]
+                dx = [x_diff[min0]]
+                dy = [y_diff[min0]]
             else:
                 z_save.append(ii)
 
                 if len(min0) == 1:
                     save.append(min0[0])
-                    dx.append(xdiff[min0])
-                    dy.append(ydiff[min0])
+                    dx.append(x_diff[min0])
+                    dy.append(y_diff[min0])
                 else:
                     for jj in range(len(min0)):
                         save.append(min0[jj])
-                        dx.append(xdiff[min0[jj]])
-                        dy.append(ydiff[min0[jj]])
+                        dx.append(x_diff[min0[jj]])
+                        dy.append(y_diff[min0[jj]])
             cnt = cnt + 1
 
     if cnt == 0:
@@ -178,8 +195,6 @@ def chun_crossmatch(x1, y1, x2, y2, dcr, silent=False, verbose=False, sph=False)
 
 
 def ds9_reg(XX, YY, ds9_file, color='green', aperture=[2.0], image=False, wcs=False, file0=''):
-    import numpy as np
-
     if color != 'green':
         color_str = ' # color = ' + color
     else:
@@ -206,7 +221,6 @@ def ds9_reg(XX, YY, ds9_file, color='green', aperture=[2.0], image=False, wcs=Fa
             ' global color=green font="helvetica 10 normal" select=1 ' +
             'highlite=1 edit=1 move=1 delete=1 include=1 fixed=0 source', coord]
 
-    # print str0
     print('### Writing : ', ds9_file)
     f = open(ds9_file, 'w')
     for jj in range(len(str0)): f.write(str0[jj] + '\n')
@@ -222,8 +236,6 @@ def random_pdf(x, dx, seed_i=False, n_iter=1000, silent=True):
     Created on 24/06/2016
     Modified on 29/06/2016 to reverse shape
     """
-
-    import numpy as np
 
     len0 = len(x)
     if not silent:
@@ -254,8 +266,6 @@ def compute_onesig_pdf(arr0, x_val, usepeak=False, silent=True, verbose=False):
     Created on 28/06/2016
     Modified on 29/06/2016 to handle change in shape
     """
-
-    import numpy as np
 
     if not silent:
         print('### Begin compute_onesig_pdf | ' + systime())
@@ -346,11 +356,6 @@ def plot_data_err_hist(x, dx, x_label, out_pdf, c0='b', m0='o', a0=0.5, s0=25,
         Additional modification to handle multiple variables
     """
 
-    from matplotlib import pyplot as plt
-    import matplotlib.gridspec as gridspec
-    import numpy as np
-    from matplotlib.backends.backend_pdf import PdfPages  # + on 29/06/2016
-
     if x.ndim == 1:
         x = x.reshape((1, len(x)))
         dx = dx.reshape((1, len(dx)))
@@ -373,7 +378,7 @@ def plot_data_err_hist(x, dx, x_label, out_pdf, c0='b', m0='o', a0=0.5, s0=25,
         # Panel 1
 
         # Get number of sources within region
-        if xlim != None and ylim != None:
+        if not isinstance(xlim, type(None)) and not isinstance(ylim, type(None)):
             in_field = [(xlim[ii, 0] <= a <= xlim[ii, 1] and
                          ylim[ii, 0] <= b <= ylim[ii, 1]) for a, b in
                         zip(x[ii], dx[ii])]
@@ -455,7 +460,6 @@ def plot_data_err_hist(x, dx, x_label, out_pdf, c0='b', m0='o', a0=0.5, s0=25,
 
 
 def quad_low_high_err(err, hi=None):
-    import numpy as np
 
     if not isinstance(hi, type(None)):
         return np.sqrt((err[:, 0] ** 2 + err[:, 1] ** 2) / 2.0)
@@ -541,11 +545,6 @@ def plot_compare(x0, y0, out_pdf, labels, extra_label=['', ''], idx=None,
 
     if not silent:
         print('### Begin plot_compare | ' + systime())
-
-    from matplotlib import pyplot as plt
-    import matplotlib.gridspec as gridspec
-    import numpy as np
-    from matplotlib.backends.backend_pdf import PdfPages
 
     if x0.ndim == 1:
         x0 = x0.reshape((1, len(x0)))
@@ -645,8 +644,14 @@ def plot_compare(x0, y0, out_pdf, labels, extra_label=['', ''], idx=None,
 
 
 def rem_dup(values):
-    # + on 18/08/2016
-    import numpy as np
+    """
+    Purpose:
+      Remove duplicates in a list
+
+    :param values: list
+    :return: numpy array containing non-duplicate arrays
+    """
+
     output = []
     seen = set()
     for value in values:
@@ -656,11 +661,10 @@ def rem_dup(values):
     return np.array(output)
 
 
-# enddef
-
 def gauss2d(xy, amplitude, xo, yo, sigma_x, sigma_y, theta, offset):
-    '''
-    2-D Gaussian for opt.curve_fit()
+    """
+    Purpose:
+      This function provides a 2-D Gaussian for scipy's opt.curve_fit()
 
     Parameters
     ----------
@@ -703,8 +707,7 @@ def gauss2d(xy, amplitude, xo, yo, sigma_x, sigma_y, theta, offset):
      - Copied from MMTtools.mmtcam for more general use
     Modified by Chun Ly, 6 May 2017
      - Fix bug. Need to import numpy
-    '''
-    import numpy as np
+    """
 
     x = xy[0]
     y = xy[1]
@@ -719,42 +722,37 @@ def gauss2d(xy, amplitude, xo, yo, sigma_x, sigma_y, theta, offset):
     return g.ravel()
 
 
-def exec_pdfmerge(files, pages, outfile, merge=False, silent=False, verbose=True):
+def exec_pdfmerge(files, pages, outfile, merge=False, silent=False):
     """
-    Executes pdfmerge command to grab necessary pages and merge them if desired
+    Purpose:
+      Executes pdfmerge (2.7x compatiable) command to grab necessary pages
+      and merge them if desired
 
     Require installing pdfmerge:
     https://pypi.python.org/pypi/pdfmerge/0.0.7
       > pip install pdfmerge
 
-    Parameters
-    ----------
-    files : list
+    :param files: list
       List of files (must include full path)
-
-    pages : list
+    :param pages: list
       List of strings indicating pages to extract.
       E.g.: ['4,6,15,20','3,8,44,50']
-
-    outfile : list or str
+    :param outfile: list or str
       Either List of files to write or a single file if merge == True
-
-    silent : boolean
-      Turns off stdout messages. Default: False
-
-    verbose : boolean
-      Turns on additional stdout messages. Default: True
-
-    Returns
-    -------
+    :param merge: bool
+      Indicate whether to merge into a single file, [outfile]
+    :param silent: bool
+      Indicate whether to silence messages
 
     Notes
     -----
     Created by Chun Ly, 22 January 2018
     """
 
-    import pdfmerge
-    from astropy import log
+    if py_vers != 2:
+        version_full = sys.version.split(' ')[0]
+        log.warning("exec_pdfmerge: Incompatible with python %s" % version_full)
+        raise SystemError("Incompatible with python %s" % version_full)
 
     if not merge:
         if len(outfile) != len(files):
