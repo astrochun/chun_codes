@@ -1,4 +1,4 @@
-from setuptools import setup, find_packages
+from setuptools import setup
 
 with open("README.md", "r") as fh:
     long_description = fh.read()
@@ -14,5 +14,10 @@ setup(
     description='Set of Python 2.7 and 3.xx codes used in astrochun\'s codes',
     long_description=long_description,
     long_description_content_type="text/markdown",
-    install_requires=['numpy', 'astropy', 'matplotlib']
+    install_requires=['numpy', 'astropy', 'matplotlib'],
+    extras_require={
+        ':python_version == "2.7"': [
+            'pdfmerge',
+        ]
+    }
 )
