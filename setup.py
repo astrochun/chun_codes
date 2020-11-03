@@ -14,10 +14,9 @@ setup(
     description='Set of Python 2.7 and 3.xx codes used in astrochun\'s codes',
     long_description=long_description,
     long_description_content_type="text/markdown",
-    install_requires=['numpy', 'astropy', 'matplotlib'],
+    install_requires=['numpy', 'astropy'],
     extras_require={
-        ':python_version == "2.7"': [
-            'pdfmerge',
-        ]
+        ':python_version == "2.7"': ['pdfmerge', 'matplotlib=3.0'],
+        ':python_version >= "3.0"': ['matplotlib']
     }
 )
