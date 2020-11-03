@@ -16,7 +16,7 @@ setup(
     long_description_content_type="text/markdown",
     install_requires=['numpy', 'astropy'],
     extras_require={
-        ':python_version == "2.7"': ['pdfmerge', 'matplotlib==3.0'],
+        ':python_version == "2.7"': ['pdfmerge', 'matplotlib==2.2.5'],
         ':python_version >= "3.0"': ['matplotlib']
     }
 )
