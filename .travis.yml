@@ -1,10 +1,15 @@
 os: linux
 dist: bionic
 language: python
-python:
-  - "2.7"
-  - "3.7"
+jobs:
+  include:
+    - name: "Python 2.7 on Bionic"
+      python: 2.7
+    - name: "Python 3.7 on Bionic"
+      python: 3.7
 
 # command to install dependencies
 install:
   - python setup.py install
+
+script: pytest
