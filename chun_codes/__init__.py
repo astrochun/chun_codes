@@ -461,7 +461,7 @@ def plot_data_err_hist(x, dx, x_label, out_pdf, c0='b', m0='o', a0=0.5, s0=25,
 
 def quad_low_high_err(err, hi=None):
 
-    if not isinstance(hi, type(None)):
+    if isinstance(hi, type(None)):
         return np.sqrt((err[:, 0] ** 2 + err[:, 1] ** 2) / 2.0)
     else:
         return np.sqrt((err ** 2 + hi ** 2) / 2.0)
