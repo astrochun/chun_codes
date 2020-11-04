@@ -1,6 +1,7 @@
 # chun_codes
 Set of Python 2.7 and 3.xx codes used in astrochun's codes
 
+[![Build Status](https://travis-ci.com/astrochun/chun_codes.svg?branch=hotfix/v0.6.0)](https://travis-ci.com/astrochun/chun_codes)
 
 ## Functional codes
 
