@@ -3,8 +3,8 @@ dist: bionic
 language: python
 jobs:
   include:
-    - name: "Python 2.7 on Bionic"
-      python: 2.7
+#    - name: "Python 2.7 on Bionic"
+#      python: 2.7
     - name: "Python 3.7 on Bionic"
       python: 3.7
 
