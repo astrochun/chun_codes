@@ -91,11 +91,12 @@ def cardelli(lambda0, R=3.1):
     t_lam = lambda0.to(u.nm).value
 
     # Handles individual values, x
+    if isinstance(t_lam, float):
+        t_lam = np.array([t_lam])
     if isinstance(t_lam, list):
         t_lam = np.array(t_lam)
-    else:
-        if not isinstance(t_lam, (np.ndarray, np.generic)):
-            t_lam = np.array([t_lam])
+    if not isinstance(t_lam, (np.ndarray, np.generic)):
+        t_lam = np.array([t_lam])
 
     x = 1.0/(t_lam/1000.0)  # in micron^-1
 
