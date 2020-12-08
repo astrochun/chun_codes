@@ -15,7 +15,7 @@ py_vers = sys.version_info.major
 if py_vers == 2:
     import pdfmerge
 
-__version__ = "0.6.0"
+__version__ = "0.7.0"
 
 
 def systime():
