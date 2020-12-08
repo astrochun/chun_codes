@@ -2,6 +2,7 @@ import numpy as np
 
 from astropy import units as u
 
+
 def uv_func_mw(x, R):
   
     Fa = -0.04473*(x-5.9)**2 - 0.009779*(x-5.9)**3
@@ -16,21 +17,21 @@ def uv_func_mw(x, R):
     b = -3.090 + 1.825 * x + 1.206/((x-4.62)**2+0.263) + Fb
 
     return a + b/R
-#enddef
+
 
 def fuv_func_mw(x, R):
 
     a = -1.073 - 0.628 * (x-8) + 0.137*(x-8)**2 - 0.070*(x-8)**3
     b = 13.670 + 4.257*(x-8) - 0.420*(x-8)**2 + 0.374*(x-8)**3
     return a + b/R
-#enddef
+
 
 def ir_func_mw(x, R):
 
     a = 0.574 * x**1.61
     b = -0.527 * x**1.61
     return a + b/R
-#enddef
+
 
 def opt_func_mw(x, R):
     y = x - 1.82
@@ -40,10 +41,10 @@ def opt_func_mw(x, R):
     b = 1.41338 * y + 2.28305 * y**2 + 1.07233 * y**3 - 5.38434 * y**4 - \
         0.62251 * y**5 + 5.30260 * y**6 - 2.09002 * y**7
     return a + b/R
-#enddef
 
-def cardelli(lambda0, R=3.1): #, extrapolate=False):
-    '''
+
+def cardelli(lambda0, R=3.1):
+    """
     NAME:
        cardelli
 
@@ -83,36 +84,41 @@ def cardelli(lambda0, R=3.1): #, extrapolate=False):
 
     REVISON HISTORY:
        Created by Chun Ly, 28 June 2016
-    '''
+    """
     # Specify units of lambda0 so that code can convert
     # Default is R=3.1
 
     t_lam = lambda0.to(u.nm).value
 
-    ## Handles individual values, x
-    if type(t_lam) == 'list':
+    # Handles individual values, x
+    if isinstance(t_lam, float):
+        t_lam = np.array([t_lam])
+    if isinstance(t_lam, list):
         t_lam = np.array(t_lam)
-    else:
-        if isinstance(t_lam, (np.ndarray, np.generic)) == False:
-            t_lam = np.array([t_lam])
+    if not isinstance(t_lam, (np.ndarray, np.generic)):
+        t_lam = np.array([t_lam])
 
-    x = 1.0/(t_lam/1000.0) #in micron^-1
+    x = 1.0/(t_lam/1000.0)  # in micron^-1
 
     k = np.zeros(np.size(t_lam), dtype=np.float64)
 
     mark = np.where((x <= 1.10) & (x >= 0.30))[0]
-    if len(mark) > 0: k[mark] = ir_func_mw(x[mark], R)
+    if len(mark) > 0:
+        k[mark] = ir_func_mw(x[mark], R)
 
     mark = np.where((x <= 3.30) & (x > 1.10))[0]
-    if len(mark) > 0: k[mark] = opt_func_mw(x[mark], R)
+    if len(mark) > 0:
+        k[mark] = opt_func_mw(x[mark], R)
 
     mark = np.where((x <= 8.00) & (x > 3.3))[0]
-    if len(mark) > 0: k[mark] = uv_func_mw(x[mark], R)
+    if len(mark) > 0:
+        k[mark] = uv_func_mw(x[mark], R)
 
     mark = np.where((x <= 10.00) & (x > 8.0))[0]
-    if len(mark) > 0: k[mark] = fuv_func_mw(x[mark], R)
+    if len(mark) > 0:
+        k[mark] = fuv_func_mw(x[mark], R)
 
     k = k * R
-    if np.size(x) == 1: k = k[0]
+    if np.size(x) == 1:
+        k = k[0]
     return k 
-#enddef
