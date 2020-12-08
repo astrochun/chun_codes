@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setup(
     name='chun_codes',
-    version='0.6.0',
+    version='0.7.0',
     packages=['chun_codes'],
     url='https://github.com/astrochun/chun_codes',
     license='MIT License',
